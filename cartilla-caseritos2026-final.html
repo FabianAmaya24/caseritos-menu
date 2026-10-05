@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Los caseritos — Pedidos por WhatsApp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --white:#FFFFFF;
+    --offwhite:#F8F6F2;
+    --red:#E4262B;
+    --red-dark:#B81E22;
+    --orange:#F5A93C;
+    --green:#3FA24A;
+    --ink:#221E1D;
+    --ink-soft:#7A716B;
+    --line:rgba(34,30,29,0.11);
+    --radius-img:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--offwhite);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:150px;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0;}
+
+  /* PROMO BANNER */
+  .promo-banner{
+    background:var(--red);
+    color:var(--white);
+    padding:11px 20px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;
+    cursor:pointer;
+    border:none;width:100%;
+    font-family:'Inter',sans-serif;
+  }
+  .promo-left{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:700;}
+  .promo-see{
+    background:var(--white);color:var(--red);
+    font-size:12.5px;font-weight:700;
+    padding:5px 14px;border-radius:16px;
+    flex-shrink:0;
+  }
+
+  /* HEADER */
+  .top{
+    background:var(--white);
+    padding:18px 20px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .top-row{display:flex;align-items:center;gap:13px;}
+  .logo-badge{
+    width:52px;height:52px;
+    border-radius:12px;
+    background:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;
+    flex-shrink:0;
+    color:var(--white);
+  }
+  .biz-name{font-size:22px;font-weight:700;line-height:1.15;color:var(--ink);}
+  .biz-tag{font-size:12.8px;color:var(--ink-soft);margin-top:2px;}
+  .top-meta{
+    margin-top:13px;
+    display:flex;flex-wrap:wrap;gap:8px 16px;
+    font-size:12.3px;color:var(--ink-soft);
+  }
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--green);font-weight:700;
+  }
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .status-pill.closed{color:var(--red-dark);}
+  .status-pill.closed .status-dot{background:var(--red-dark);}
+
+  /* CATEGORY NAV */
+  .cat-nav{
+    position:sticky;top:0;z-index:20;
+    background:var(--white);
+    border-bottom:1px solid var(--line);
+    padding:12px 20px;
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .cat-nav::-webkit-scrollbar{display:none;}
+  .cat-btn{
+    background:none;
+    border:1.5px solid transparent;
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;font-weight:600;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    padding:7px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .cat-btn.active{
+    color:var(--red);
+    border-color:var(--red);
+    background:var(--white);
+  }
+
+  /* MENU */
+  .menu-wrap{padding:22px 20px 8px;max-width:640px;margin:0 auto;}
+  .cat-section{margin-bottom:28px;}
+  .cat-heading{
+    font-size:20px;font-weight:600;color:var(--red);
+    margin-bottom:2px;
+  }
+  .cat-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;}
+
+  .item{
+    display:flex;
+    gap:14px;
+    padding:15px 0;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .item:last-child{border-bottom:none;}
+  .item-img{
+    width:78px;height:78px;
+    border-radius:var(--radius-img);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:32px;
+    position:relative;
+    background:var(--offwhite);
+    border:1px solid var(--line);
+    overflow:hidden;
+  }
+  .item-img img{
+    width:100%;height:100%;
+    object-fit:cover;
+    border-radius:var(--radius-img);
+  }
+  .discount-flag{
+    position:absolute;
+    top:-6px;left:-6px;
+    background:var(--orange);
+    color:var(--ink);
+    font-size:10.5px;font-weight:700;
+    padding:2px 6px;
+    border-radius:5px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.15);
+  }
+  .item-info{flex:1;min-width:0;}
+  .item-name{font-size:15.2px;font-weight:700;color:var(--ink);}
+  .item-desc{
+    font-size:12.6px;color:var(--ink-soft);
+    margin-top:2px;line-height:1.4;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .item-bottom{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:9px;
+  }
+  .price-row{display:flex;align-items:baseline;gap:7px;}
+  .price-now{font-size:15px;font-weight:700;color:var(--red);}
+  .price-old{font-size:12.3px;color:var(--ink-soft);text-decoration:line-through;}
+
+  .add-btn{
+    width:30px;height:30px;border-radius:8px;
+    background:var(--red);color:var(--white);
+    border:none;font-size:19px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:transform .12s ease;
+    flex-shrink:0;
+  }
+  .add-btn:active{transform:scale(0.88);}
+
+  .stepper{
+    display:flex;align-items:center;gap:10px;
+    background:var(--red);
+    border-radius:8px;
+    padding:3px 5px;
+  }
+  .stepper button{
+    width:24px;height:24px;border-radius:6px;
+    background:var(--white);color:var(--red);
+    border:none;font-size:15px;font-weight:700;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stepper span{color:var(--white);font-size:13.5px;font-weight:700;min-width:14px;text-align:center;}
+
+  /* FLOATING CART BAR */
+  .cart-bar{
+    position:fixed;left:16px;right:16px;bottom:70px;
+    background:var(--red);color:var(--white);
+    border-radius:14px;
+    padding:13px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    box-shadow:0 8px 24px rgba(180,30,30,0.35);
+    z-index:30;
+    transform:translateY(120%);
+    transition:transform .28s cubic-bezier(.2,.9,.3,1);
+  }
+  .cart-bar.show{transform:translateY(0);}
+  .cart-bar-info{font-size:13.5px;line-height:1.3;}
+  .cart-bar-info b{font-size:15px;display:block;}
+  .cart-bar-btn{
+    background:var(--white);color:var(--red);
+    border:none;border-radius:9px;
+    padding:9px 16px;font-weight:700;font-size:13.5px;
+    cursor:pointer;
+  }
+
+  /* DRAWER */
+  .overlay{
+    position:fixed;inset:0;background:rgba(34,30,29,0.5);
+    z-index:40;opacity:0;pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .drawer{
+    position:fixed;left:0;right:0;bottom:0;
+    max-width:640px;margin:0 auto;
+    background:var(--white);
+    border-radius:18px 18px 0 0;
+    z-index:41;
+    max-height:82vh;
+    display:flex;flex-direction:column;
+    transform:translateY(100%);
+    transition:transform .3s cubic-bezier(.2,.9,.3,1);
+  }
+  .drawer.show{transform:translateY(0);}
+  .drawer-handle{
+    width:38px;height:4px;background:var(--line);
+    border-radius:3px;margin:10px auto 4px;
+  }
+  .drawer-head{
+    padding:6px 20px 14px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .drawer-head h2{font-size:19px;}
+  .drawer-close{background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;}
+  .drawer-body{padding:14px 20px;overflow-y:auto;flex:1;}
+  .empty-msg{text-align:center;color:var(--ink-soft);font-size:14px;padding:30px 0;}
+
+  .cart-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:11px 0;border-bottom:1px solid var(--line);
+    gap:10px;
+  }
+  .cart-row-name{font-size:14px;font-weight:700;}
+  .cart-row-price{font-size:12.5px;color:var(--ink-soft);}
+  .cart-row-remove{
+    background:none;border:none;color:var(--red);
+    font-size:12px;text-decoration:underline;cursor:pointer;padding:0;margin-top:3px;
+  }
+
+  .notes-label{font-size:13px;font-weight:600;margin:16px 0 6px;display:block;}
+  .notes-input{
+    width:100%;border:1px solid var(--line);border-radius:9px;
+    padding:10px 12px;font-family:'Inter',sans-serif;font-size:13.5px;
+    resize:none;background:var(--offwhite);
+  }
+  .notes-input:focus{outline:2px solid var(--orange);}
+
+  .drawer-foot{
+    padding:14px 20px 22px;
+    border-top:1px solid var(--line);
+    background:var(--white);
+  }
+  .total-row{
+    display:flex;justify-content:space-between;
+    font-size:15.5px;font-weight:700;margin-bottom:12px;
+  }
+  .send-btn{
+    width:100%;background:var(--red);color:var(--white);
+    border:none;border-radius:12px;padding:14px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+  }
+  .send-btn:disabled{background:#DCC9C4;cursor:not-allowed;}
+  .send-btn svg{width:19px;height:19px;flex-shrink:0;}
+
+  @media (prefers-reduced-motion: reduce){
+    .cart-bar,.drawer,.overlay,.add-btn{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+  GUÍA DE PERSONALIZACIÓN (para quien edite este archivo):
+  1. Busca el objeto CONFIG en el <script> al final del archivo.
+  2. Cambia nombre del negocio, número de WhatsApp, estado (abierto/cerrado).
+  3. Edita el array PRODUCTS: cada producto necesita categoría, nombre,
+     descripción, precio, precio anterior (opcional) y un emoji como imagen.
+  4. Las categorías del menú se generan solas a partir de PRODUCTS.
+  5. La categoría "Promos" alimenta también el banner rojo de arriba
+     (toma el primer producto con descuento de esa categoría).
+============================================================= -->
+
+<button class="promo-banner" id="promoBanner">
+  <span class="promo-left" id="promoText">🎉 Promos con hasta 20% de descuento</span>
+  <span class="promo-see">Ver</span>
+</button>
+
+<header class="top">
+  <div class="top-row">
+    <div class="logo-badge" id="logoBadge">🍽️</div>
+    <div>
+      <h1 class="biz-name" id="bizName">Los caseritos</h1>
+      <p class="biz-tag" id="bizTag">Cocina casera, hecha al momento</p>
+    </div>
+  </div>
+  <div class="top-meta">
+    <span class="status-pill" id="statusPill"><span class="status-dot"></span> Abierto ahora</span>
+    <span>Envios a cualquier punto de la ciudad </span>
+  </div>
+</header>
+
+<nav class="cat-nav" id="catNav"></nav>
+
+<main class="menu-wrap" id="menuWrap"></main>
+
+<div class="cart-bar" id="cartBar">
+  <div class="cart-bar-info">
+    <span id="cartBarCount">0 productos</span>
+    <b id="cartBarTotal">$0.000</b>
+  </div>
+  <button class="cart-bar-btn" id="openCartBtn">Ver pedido</button>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-head">
+    <h2>Tu pedido</h2>
+    <button class="drawer-close" id="closeCartBtn">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <div class="total-row">
+      <span>Total</span>
+      <span id="drawerTotal">$0.000</span>
+    </div>
+    <button class="send-btn" id="sendBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 21L4.6 16.2C3.6 14.6 3 12.8 3 11C3 5.9 7.5 2 12.5 2C17.5 2 21.5 6 21.5 11C21.5 16 17.5 20 12.5 20C10.8 20 9.2 19.5 7.9 18.7L3 21Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      </svg>
+      Confirmar pedido por WhatsApp
+    </button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — edita aquí los datos del negocio y el menú
+============================================================= */
+const CONFIG = {
+  businessName: "Los caseritos",
+  tagline: "Cocina casera, hecha al momento",
+  logoEmoji: "🍽️",
+  schedule: [   {start:"12:00", end:"14:30"},   {start:"20:00", end:"00:30"} ],
+  whatsappNumber: "5492657633889", // código de país + número, sin espacios ni "+"
+  currency: "$"
+};
+
+const PRODUCTS = [
+  // PROMOS
+  {id:1, cat:"Promos", name:"2 Lomos clasicos", desc:"Dos lomos clasicos con papas fritas.", price:26000, oldPrice:28000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:2, cat:"Promos", name:"3 Lomos clasicos", desc:"Tres lomos clasicos con papas fritas.", price:40000, oldPrice:42000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:3, cat:"Promos", name:"2 Hamburguesas clasicas", desc:"Dos hamburguesas clasicas con papas fritas.", price:17000, oldPrice:20000, img:"https://i.ibb.co/Q7Whn3sf/file-00000000571c820ea472071c70a54633.png"},
+  {id:4, cat:"Promos", name:"3 Hamburguesas clasicas ", desc:"Tres hamburguesas clasicas con papas fritas.", price:28000, oldPrice:30000, img:"https://i.ibb.co/Q7Whn3sf/file-00000000571c820ea472071c70a54633.png"},
+  {id:5, cat:"Promos", name:"2 Milas napo", desc:"Dos milanesas napolitanas con papas fritas", price:28000, oldPrice:30000, img:"https://i.ibb.co/WWdxRcp6/file-000000003f2c8211b72056ca1aec876b.png"},
+  {id:6, cat:"Promos", name:"3 Milas napo", desc:"Tres milanesas napolitanas con papas fritas", price:43000, oldPrice:45000, img:"https://i.ibb.co/WWdxRcp6/file-000000003f2c8211b72056ca1aec876b.png"},
+  {id:7, cat:"Promos", name:"2 Sand milanesa", desc:"Dos sandwich de milanesas con papas fritas", price:26000, oldPrice:28000, img:"https://i.ibb.co/8gYsxycD/27fd2bbafe1afd4a22ee439e7b3fc0c3.jpg"},
+  {id:8, cat:"Promos", name:"3 Sand milanesa", desc:"Tres sandwich de milanesas con papas fritas", price:40000, oldPrice:42000, img:"https://i.ibb.co/8gYsxycD/27fd2bbafe1afd4a22ee439e7b3fc0c3.jpg"},
+  {id:9, cat:"Promos", name:"1 Doc carne + 1 doc jamon y queso", desc:"Una docena de carne y una docena de jamón y queso", price:28000, img:"https://i.ibb.co/7drWyxKq/empanada-jyq.png"},
+  {id:10, cat:"Promos", name:"2 Pizzas muzzarellas", desc:"Dos pizzas mozzarella.", price:20000, oldPrice:22000, img:"https://i.ibb.co/0yMhDhrm/file-00000000aab0720e8a7dd6044cf4aced.png"},
+  {id:11, cat:"Promos", name:"1 Muzza + 1 especial", desc:"Una pizza mozzarella y una pizza especial.", price:24000, oldPrice:26000, img:"https://i.ibb.co/kgRYWS8P/file-000000007014720ea2cf9f917c3f69b5.png"},
+  {id:12, cat:"Promos", name:"1 Muzza + 1 napo", desc:"Una pizza muzzarella y una pizza napolitana.", price:22000, oldPrice:24000, img:"https://i.ibb.co/K1LGMPr/file-00000000739071f5bcbce2e99f1da962.png"},
+  {id:13, cat:"Promos", name:"1 Doc carne + 1 pizza muzzarella", desc:"Una docena de empanadas de carne y una pizza muzzarella.", price:25000, oldPrice:26000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:14, cat:"Promos", name:"1 Doc jamon y queso + 1 pollo entero", desc:"Una docena de empanadas de jamon y queso, y un pollo asado al horno con fritas.", price:36000, oldPrice:38000, img:"https://i.ibb.co/bgbNrkXQ/IMG-20261004-164630.jpg"},
+  {id:15, cat:"Promos", name:"Combo 6 tacos + 3 salsas a elección.", desc:"Seis tacos con salsas a eleccion (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:17000, oldPrice:18000, img:"https://i.ibb.co/JRBdyLLt/file-000000009fd8820e939c3532de67b41a.png"},
+  {id:16, cat:"Promos", name:"Combo 2 burritos + 3 salsas a elección", desc:"Dos burritos con salsas a eleccion (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:19000, oldPrice:20000, img:"https://i.ibb.co/MkfKSgsZ/file-00000000d73c820e94d94c7584ffe265.png"},
+  
+  // PIZZAS
+  {id:17, cat:"Pizzas", name:"Pizza muzzarella", desc:"Mozzarella, orégano y aceitunas.", price:11000, img:"https://i.ibb.co/0yMhDhrm/file-00000000aab0720e8a7dd6044cf4aced.png"},
+  {id:18, cat:"Pizzas", name:"Pizza doble muzza", desc:"Doble mozzarella, aceitunas y orégano.", price:13000, img:"https://i.ibb.co/0yMhDhrm/file-00000000aab0720e8a7dd6044cf4aced.png"},
+  {id:19, cat:"Pizzas", name:"Pizza especial", desc:"Mozzarella, huevo duro, jamón, morrón y orégano.", price:15000, img:"https://i.ibb.co/kgRYWS8P/file-000000007014720ea2cf9f917c3f69b5.png"},
+  {id:20, cat:"Pizzas", name:"Pizza especial con anchoas", desc:"Mozzarella, huevo duro, jamon, morrón, anchoas y orégano.", price:17000, img:"https://i.ibb.co/jk1gNN1r/file-000000002694720ea216208e325e18b7.png"},
+  {id:21, cat:"Pizzas", name:"Pizza napolitana", desc:"Mozzarella, tomate en rodajas y orégano.", price:13000, img:"https://i.ibb.co/K1LGMPr/file-00000000739071f5bcbce2e99f1da962.png"},
+  {id:22, cat:"Pizzas", name:"Pizza napolitana especial", desc:"Mozzarella, tomate en rodajas, jamón, huevo duro, morrón  y orégano.", price:15000, img:"https://i.ibb.co/fYyYF5vB/file-000000005f5c720eb5377fca03f552e8.png"},
+  {id:23, cat:"Pizzas", name:"Pizza calabresa", desc:"Mozzarella, salame en rodajas, aceituna y orégano.", price:15000, img:"https://i.ibb.co/xtqqKS7t/file-000000009c24720ea0d32967d29edefc.png"},
+  {id:24, cat:"Pizzas", name:"Pizza fugazzeta", desc:"Mozzarella, cebolla caramelizada, aceitunas y orégano.", price:14000, img:"https://i.ibb.co/ymJZVzjr/file-00000000171071f5948268b4fb116a62.png"},
+  {id:25, cat:"Pizzas", name:"Pizza 4 quesos", desc:"Mozzarella, queso roquefort, provoleta, aceitunas y orégano.", price:16000, img:"https://i.ibb.co/rfc341R2/file-000000006ed481fd88930424f581c722.png"},
+  {id:26, cat:"Pizzas", name:"Pizza choclo", desc:"Mozzarella, choclo, aceitunas y orégano.", price:15000, img:"https://i.ibb.co/gZnKvn0s/file-0000000052ec820ea5f0d5370d071b3c.png"},
+  {id:27, cat:"Pizzas", name:"Pizza palmito con jamon", desc:"Mozzarella, palmitos, jamon, aceitunas y orégano.", price:18000, img:"https://i.ibb.co/MxWxZ3Xc/file-000000009e20720eb09fea545602a1f0.png"},
+  {id:28, cat:"Pizzas", name:"Pizza palmito", desc:"Mozzarella, palmito, aceitunas y orégano.", price:18000, img:"https://i.ibb.co/rKsRrGKk/file-000000008148820e85c75704e8a0cb5a.png"},
+  {id:29, cat:"Pizzas", name:"Pizza champiñon", desc:"Mozzarella, champiñon, aceitunas y orégano.", price:17000, img:"https://i.ibb.co/7t7g7P9N/file-0000000050c8820eafc80ed2e0ee2840.png"},
+  {id:30, cat:"Pizzas", name:"Pizza bum bum", desc:"Mozzarella, huevo fritos, aceitunas y orégano.", price:18000, img:"https://i.ibb.co/4ZtrqH69/file-000000001ae4820e9746b4e1ef9fdcd7.png"},
+  {id:31, cat:"Pizzas", name:"Pizza roquefort", desc:"Mozzarella, queso roquefort, aceitunas y orégano.", price:16000, img:"https://i.ibb.co/prZNDqQ6/file-000000006584820e817973a300d23e0f.png"},
+  {id:32, cat:"Pizzas", name:"Pizza panceta", desc:"Mozzarella, panceta, aceitunas y orégano.", price:17000, img:"https://i.ibb.co/4ZzjHzvJ/file-000000007724820eb883fafbc67c9757.png"},
+  {id:33, cat:"Pizzas", name:"Pizza atun", desc:"Mozzarella, atun, aceitunas y orégano.", price:15000, img:"https://i.ibb.co/XZZJJmMH/file-000000006868820e9f8e19f4c4aefc70.png"},
+  {id:34, cat:"Pizzas", name:"Pizza ananá", desc:"Mozzarella, ananá, aceitunas y orégano.", price:18000, img:"https://i.ibb.co/LdWsLS5m/file-00000000bf1c820e9712620b818d3d17.png"},
+  {id:35, cat:"Pizzas", name:"Pizza pollo", desc:"Mozzarella, pollo desmenuzado, aceitunas y orégano.", price:15000, img:"https://i.ibb.co/twk5pt5X/file-00000000be5c820bb4ac9d637d3871d5.png"},
+  {id:36, cat:"Pizzas", name:"Pizza los caseritos", desc:"Mozzarella, papas fritas, panceta, verdeo, aceitunas y orégano.", price:18000, img:"https://i.ibb.co/QvwyHgpP/file-00000000c304820e98be947189a3bd4c.png."},
+  {id:37, cat:"Pizzas", name:"Pizza ternera", desc:"Mozzarella, carne desmechada, aceitunas y orégano.", price:18000, img:"https://i.ibb.co/ccgFh5Bn/file-00000000b8e4820a91e88fc97997ed21.png"},
+  {id:38, cat:"Pizzas", name:"Pizza salchipapa", desc:"Mozzarella, salchicha en rodajas, cheddar y acetunas.", price:17000, img:"https://i.ibb.co/8gcGfrsG/file-000000004e00820eb7b6853748e0a012.png"},
+  {id:39, cat:"Pizzas", name:"Pizza salsa criolla ", desc:"Mozzarella, salsa criolla , aceitunas y orégano.", price:15000, img:"https://i.ibb.co/1G4B70QZ/file-000000001aa0820ea8c5098670a4781f.png"},
+  {id:40, cat:"Pizzas", name:"Pizza huevo duro", desc:"Mozzarella, huevo duro, aceitunas y orégano.", price:14000, img:"https://i.ibb.co/vvqkzqZJ/file-0000000036c0820ea1330e9156f69a4d.png"},
+  {id:41, cat:"Pizzas", name:"Pizza chorizo salteado", desc:"Mozzarella, chorizo salteado y aceitunas.", price:16000, img:"https://i.ibb.co/Y4TYnwnH/file-00000000568c820e8c8055e2c9c0ce53.png"},
+  {id:42, cat:"Pizzas", name:"Pizza chimichurri y tomate ", desc:"Mozzarella, chimichurri, aceitunas y orégano.", price:15000, img:"https://i.ibb.co/BKT9JMj8/file-00000000c5a4820ebea8c305208abdbd.png"},
+  {id:43, cat:"Pizzas", name:"Pizza salchichas", desc:"Mozzarella, salchichas, aceitunas y orégano.", price:15000, img:"https://i.ibb.co/GvGTDy1s/file-00000000e974820e82c1d6c56b55ec6f.png"},
+
+  // EMPANADAS (1 DOCENA)
+  {id:44, cat:"Empanadas", name:"Empanada de carne", desc:"Masa horneada rellena de carne.", price:14000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:45, cat:"Empanadas", name:"Empanada de jamon y queso", desc:"Relleno de jamon y queso muzzarella.", price:14000, img:"https://i.ibb.co/7drWyxKq/empanada-jyq.png"},
+  {id:46, cat:"Empanadas", name:"Empanada de pollo", desc:"Relleno de pollo desmenuzado con especias.", price:16000, img:"https://i.ibb.co/BVwxQPbr/images-2.jpg"},
+  {id:47, cat:"Empanadas", name:"Empanada arabe", desc:"Relleno de carne, cebolla y morron.", price:16000, img:"https://i.ibb.co/ycbN08bP/file-000000001710820ea9c2bae960c8f3ce.png"},
+  {id:48, cat:"Empanadas", name:"Empanada matambre al cuchillo", desc:"Relleno de carne de matambre cortado a cuchillo y muzzarella.", price:16000, img:"https://i.ibb.co/1tZJtp3C/file-00000000d7b8820eaf81bd452e607cbc.png"},
+  {id:49, cat:"Empanadas", name:"Empanada de roquefort, jamon y muzza", desc:"Relleno de queso roquefort, jamon y queso muzzarella.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:50, cat:"Empanadas", name:"Empanada de acelga y atun", desc:"Relleno de verduras y atun.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:51, cat:"Empanadas", name:"Empanada de choclo", desc:"Relleno de choclo y muzzarella.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:52, cat:"Empanadas", name:"Empanada de cebolla y queso", desc:"Relleno de queso muzzarella y choclo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:53, cat:"Empanadas", name:"Empanada de carne cortada a cuchillo", desc:"Relleno de carne cortada a cuchillo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:54, cat:"Empanadas", name:"Empanada de roquefort con nueces", desc:"Relleno de roquefort y nueces.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:55, cat:"Empanadas", name:"Empanada caprese", desc:"Relleno de tomate.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:56, cat:"Empanadas", name:"Empanada de humita", desc:"Relleno de humita de choclo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:57, cat:"Empanadas", name:"Empanada de carne dulce", desc:"Relleno de carne y pasas de uva.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:58, cat:"Empanadas", name:"Empanada los caseritos", desc:"Relleno de carne cortada a cuchillo, morron, cebolla y especias.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:59, cat:"Empanadas", name:"Empanada de carne y muzza", desc:"Relleno de muzzarella y carne.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:60, cat:"Empanadas", name:"Empanada napolitana", desc:"Relleno de tomate.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:61, cat:"Empanadas", name:"Empanada de verdura", desc:"Relleno de acelga, zapallo, zanahoria y huevo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  
+  // EMPANADAS (1/2 DOCENA)
+  {id:62, cat:"Empanadas", name:"Empanada de carne (1/2 Doc)", desc:"Masa horneada rellena de carne.", price:14000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:63, cat:"Empanadas", name:"Empanada de jamon y queso (1/2 Doc)", desc:"Relleno de jamon y queso muzzarella.", price:14000, img:"https://i.ibb.co/7drWyxKq/empanada-jyq.png"},
+  {id:64, cat:"Empanadas", name:"Empanada de pollo (1/2 Doc)", desc:"Relleno de pollo desmenuzado con especias.", price:16000, img:"https://i.ibb.co/BVwxQPbr/images-2.jpg"},
+  {id:65, cat:"Empanadas", name:"Empanada arabe (1/2 Doc)", desc:"Relleno de carne, cebolla y morron.", price:16000, img:"https://i.ibb.co/ycbN08bP/file-000000001710820ea9c2bae960c8f3ce.png"},
+  {id:66, cat:"Empanadas", name:"Empanada matambre al cuchillo (1/2 Doc)", desc:"Relleno de carne de matambre cortado a cuchillo y muzzarella.", price:16000, img:"https://i.ibb.co/1tZJtp3C/file-00000000d7b8820eaf81bd452e607cbc.png"},
+  {id:67, cat:"Empanadas", name:"Empanada de roquefort, jamon y muzza (1/2 Doc)", desc:"Relleno de queso roquefort, jamon y queso muzzarella.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:68, cat:"Empanadas", name:"Empanada de acelga y atun (1/2 Doc)", desc:"Relleno de verduras y atun.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:69, cat:"Empanadas", name:"Empanada de choclo (1/2 Doc)", desc:"Relleno de choclo y muzzarella.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:70, cat:"Empanadas", name:"Empanada de cebolla y queso (1/2 Doc)", desc:"Relleno de queso muzzarella y choclo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:71, cat:"Empanadas", name:"Empanada de carne cortada a cuchillo (1/2 Doc)", desc:"Relleno de carne cortada a cuchillo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:72, cat:"Empanadas", name:"Empanada de roquefort con nueces (1/2 Doc)", desc:"Relleno de roquefort y nueces.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:73, cat:"Empanadas", name:"Empanada caprese (1/2 Doc)", desc:"Relleno de tomate.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:74, cat:"Empanadas", name:"Empanada de humita (1/2 Doc)", desc:"Relleno de humita de choclo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:75, cat:"Empanadas", name:"Empanada de carne dulce (1/2 Doc)", desc:"Relleno de carne y pasas de uva.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:76, cat:"Empanadas", name:"Empanada los caseritos (1/2 Doc)", desc:"Relleno de carne cortada a cuchillo, morron, cebolla y especias.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:77, cat:"Empanadas", name:"Empanada de carne y muzza (1/2 Doc)", desc:"Relleno de muzzarella y carne.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:78, cat:"Empanadas", name:"Empanada napolitana (1/2 Doc)", desc:"Relleno de tomate.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+  {id:79, cat:"Empanadas", name:"Empanada de verdura (1/2 Doc)", desc:"Relleno de acelga, zapallo, zanahoria y huevo.", price:16000, img:"https://i.ibb.co/6cBqp14T/carne-r-17072020-dan-44231-6560a9c0c652593fdb15997480210393-1024-1024.jpg"},
+
+  // HAMBURGUESAS
+  {id:80, cat:"Hamburguesas", name:"Hamburguesa clasica", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:10000, oldPrice:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:81, cat:"Hamburguesas", name:"Hamburguesa chicken", desc:"Medallón de pollo, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:82, cat:"Hamburguesas", name:"Hamburguesa rechicken", desc:"Doble medallón de pollo, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:83, cat:"Hamburguesas", name:"Hamburguesa doble carne", desc:"Doble medallón, tomate, lechuga, huevo frito, jamón y queso.", price:12000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:84, cat:"Hamburguesas", name:"Hamburguesa papichula", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:85, cat:"Hamburguesas", name:"Hamburguesa criolla", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:86, cat:"Hamburguesas", name:"Hamburguesa vegetariana", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:87, cat:"Hamburguesas", name:"Hamburguesa paltita", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:88, cat:"Hamburguesas", name:"Hamburguesa azul", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:89, cat:"Hamburguesas", name:"Hamburguesa americana", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:90, cat:"Hamburguesas", name:"Hamburguesa yankee", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:91, cat:"Hamburguesas", name:"Hamburguesa caserita", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+  {id:92, cat:"Hamburguesas", name:"Hamburguesa cascarita", desc:"Medallón de carne, tomate, lechuga, huevo frito, jamón y queso.", price:11000, img:"https://i.ibb.co/HDR45jQc/file-000000004930820ea2b06b4056685d93.png"},
+
+  // LOMOS
+  {id:93, cat:"Lomos", name:"Lomito clasico", desc:"Bife de carne, jamón, queso, lechuga, tomate y huevo.", price:14000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:94, cat:"Lomos", name:"Lomo criollo", desc:"Bifw de carne, jamón, queso, lechuga, tomate, huevo y salsa criolla.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:95, cat:"Lomos", name:"Lomo cascarita", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo, bondiola y cheddar", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:96, cat:"Lomos", name:"Lomo papichulo", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo, cebolla caramelizada y cheddar", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:97, cat:"Lomos", name:"Lomo grinch", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo, cheddar, panceta y verdeo.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:98, cat:"Lomos", name:"Lomo chavito", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo, y crema de champiñon.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:99, cat:"Lomos", name:"Lomo palta", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo y palta.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:100, cat:"Lomos", name:"Lomo pollo", desc:"Bife de pollo, jamón, queso, lechuga, tomate y huevo.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:101, cat:"Lomos", name:"Lomo cerdo", desc:"Bife de cerdo, jamón, queso, lechuga, tomate y huevo.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:102, cat:"Lomos", name:"Lomo chimi", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo y chimichurri.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:103, cat:"Lomos", name:"Lomo azul ", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo y roquefort.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:104, cat:"Lomos", name:"Lomo vegetariano", desc:"Zapallo, berenjena, morron, cebolla, lechuga, tomate y huevo.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+  {id:105, cat:"Lomos", name:"Lomo americano", desc:"Bife de carne, jamón, queso, lechuga, tomate, huevo, morron y muzza.", price:16000, img:"https://i.ibb.co/pvmbycBb/file-00000000efa0820e9b600c8b0c3c498a.png"},
+
+  // SANDWICHES
+  {id:106, cat:"Sandwiches", name:"Sandwich de milanesa", desc:"Milanesa de carne, lechuga, tomate y mayonesa casera.", price:14000, img:"https://i.ibb.co/8gYsxycD/27fd2bbafe1afd4a22ee439e7b3fc0c3.jpg"},
+  {id:107, cat:"Sandwiches", name:"Chorilomo ", desc:"Chorizo, tomate, lechuga, jamon, queso y huevo frito.", price:12000, img:"https://i.ibb.co/j9fgx7PW/file-00000000e934820eb86131561b7f35a5.png"},
+  {id:108, cat:"Sandwiches", name:"Sandwich de choripan", desc:"Chorizo, tomate y lechuga.", price:13000, img:"https://i.ibb.co/zhkjcXJ7/file-0000000091a0820eb061e8178c4e5991.png"},
+
+  // BARROLUCO
+  {id:109, cat:"Barroluco", name:"Barroluco", desc:"Tomate, lechuga, huevo frito, bife de carne, jamon y doble capa de queso.", price:17000, img:"https://i.ibb.co/d0b4Wznz/file-00000000580c820e89367357611ce471.png"},
+
+  // SANDWICH DE MIGA
+  {id:110, cat:"Sandwich de miga", name:"1 Doc Sandwich de miga", desc:"Variedades a elección: Jamón y queso, Verdura, Tomate y huevo, Roquefort, Pollo, Aceituna y huevo.", price:20000, img:"https://i.ibb.co/QBCc6kj/MP-Anana-100.jpg"},
+  {id:111, cat:"Sandwich de miga", name:"1/2 Doc Sandwich de miga", desc:"Variedades a elección: Jamón y queso, Verdura, Tomate y huevo, Roquefort, Pollo, Aceituna y huevo.", price:11000, img:"https://i.ibb.co/QBCc6kj/MP-Anana-100.jpg"},
+  
+  // TARTA
+  {id:112, cat:"Tarta", name:"Tarta de jamón y queso", desc:"Tarta completa de jamon y queso.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:113, cat:"Tarta", name:"Tarta de verduras", desc:"Acelga, huevo, zanahoria, zapallo y perejil.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:114, cat:"Tarta", name:"Tarta de acelga y atún", desc:"Relleno de acelga y atun.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:115, cat:"Tarta", name:"Tarta de cebolla y queso", desc:"Relleno de cebolla y queso, hecha del día.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:116, cat:"Tarta", name:"Tarta de choclo, cebolla y queso", desc:"Relleno de choclo, cebolla y queso, hecha del día.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:117, cat:"Tarta", name:"Tarta de jamón y roquefort", desc:"Relleno de jamon y queso roquefort, hecha del día.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:118, cat:"Tarta", name:"Tarta de salchichas y cheddar", desc:"Relleno de salchichas y cheddar, hecha del día.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:119, cat:"Tarta", name:"Tarta de pollo y verduras", desc:"Relleno de pollo, acelga, huevo, zanahoria, zapallo y perejil, hecha del día.", price:18000, img:"https://i.ibb.co/bjNFWh0q/file-000000006850820eb2809bcd0898cf42.png"},
+  {id:120, cat:"Tarta", name:"1/2 Tarta de jamón y queso", desc:"Relleno de jamon y queso, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:121, cat:"Tarta", name:"1/2 Tarta de verduras", desc:"Acelga, huevo, zanahoria, zapallo y perejil, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:122, cat:"Tarta", name:"1/2 Tarta de acelga y atún", desc:"Relleno de acelga y atun, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:123, cat:"Tarta", name:"1/2 Tarta de cebolla y queso", desc:"Relleno de cebolla y queso, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:124, cat:"Tarta", name:"1/2 Tarta de choclo, cebolla y queso", desc:"Relleno de choclo, cebolla y queso, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:125, cat:"Tarta", name:"1/2 Tarta de jamón y roquefort", desc:"Relleno de jamon y queso roquefort, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:126, cat:"Tarta", name:"1/2 Tarta de salchichas y cheddar", desc:"Relleno de salchichas y cheddar, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+  {id:127, cat:"Tarta", name:"1/2 Tarta de pollo y verduras", desc:"Relleno de pollo, acelga, zanahoria, zapallo y perejil, hecha del día.", price:10000, img:"https://i.ibb.co/TqPSgcNM/file-00000000d13c820e9c5837727d1ca9c1.png"},
+
+  // TORTILLA
+  {id:128, cat:"Tortilla", name:"Tortilla de papas clásica", desc:"Porción generosa, hecha con papa, ajo y perejil.", price:9000, img:"https://i.ibb.co/S4h8hnk8/file-000000006eb4820e9963530ef5856af8.png"},
+  {id:129, cat:"Tortilla", name:"Tortilla de papa rellena", desc:"Porción generosa, hecha con papa, huevo, ajo, perejil, jamon y queso.", price:10000, img:"https://i.ibb.co/S4h8hnk8/file-000000006eb4820e9963530ef5856af8.png"},
+  {id:130, cat:"Tortilla", name:"Tortilla de papa napolitana", desc:"Porción generosa, hecha con papa, huevo, ajo, perejil, muzza y jamon.", price:10000, img:"https://i.ibb.co/HM1Bvz1/file-000000004350820e867351ef216f8efc.png"},
+  {id:131, cat:"Tortilla", name:"Tortilla de verduras", desc:"Porción generosa, hecha con acelga, ajo, zanahoria, zapallo y perejil.", price:9000, img:"https://i.ibb.co/B5cw0wjS/file-000000007344820e91290daacbd94d2c.png"},
+  {id:132, cat:"Tortilla", name:"Tortilla los caseritos", desc:"Porción generosa, hecha con papa, huevo, cebolla y morron.", price:10000, img:"https://i.ibb.co/S4h8hnk8/file-000000006eb4820e9963530ef5856af8.png"},
+
+  // POLLO ASADO
+  {id:133, cat:"Pollo asado", name:"Pollo entero", desc:"Pollo entero asado al horno con papas fritas, listo para compartir.", price:24000, oldPrice:26000, img:"https://i.ibb.co/bgbNrkXQ/IMG-20261004-164630.jpg"},
+  {id:134, cat:"Pollo asado", name:"1/2 Pollo asado", desc:"Medio pollo asado al horno con papas fritas , listo para compartir.", price:14000, oldPrice:16000, img:"https://i.ibb.co/bgbNrkXQ/IMG-20261004-164630.jpg"},
+  {id:135, cat:"Pollo asado", name:"1/4 Pollo asado", desc:"Cuarto de pollo asado al horno con papas fritas, con papas.", price:7500, img:"https://i.ibb.co/bgbNrkXQ/IMG-20261004-164630.jpg"},
+ 
+  // TACOS
+  {id:136, cat:"Tacos", name:"Tacos de pollo (3u)", desc:"Pollo gratinado con verduras + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:9000, img:"https://i.ibb.co/d0RBWfw4/file-00000000a3ac820ea2abe9c474fa1a18.png"},
+  {id:137, cat:"Tacos", name:"Tacos de carne (3u)", desc:"Carne, cebolla y morrón + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:10000, img:"https://i.ibb.co/spbCV0pf/file-000000003f90820e93fc03c36795eef8.png"},
+  {id:138, cat:"Tacos", name:"Tacos vegano (3u)", desc:"Cebolla morada, morron, zanahoria y zapallito verde + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:8000, img:"https://i.ibb.co/Cp2zBmf2/file-0000000039c8820eb1043069fcf67644.png"},
+  {id:139, cat:"Tacos", name:"Tacos de la casa (3u)", desc:"Carne, panceta, morrón y gramajo + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:10000, img:"https://i.ibb.co/cShn2Rg6/file-00000000343c820eb9ad994c5a3b60f1.png"},
+
+  // BURRITOS
+  {id:140, cat:"Burritos", name:"Burrito de pollo", desc:"Pollo gratinado con verduras + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:10000, img:"https://i.ibb.co/BVDPt5bp/file-00000000a800820ea889d5ece2a2929a.png"},
+  {id:141, cat:"Burritos", name:"Burrito de carne", desc:"Carne, cebolla y morrón + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:11000, img:"https://i.ibb.co/Z6q5Qg17/file-00000000f128820eb7150acadd1fa97a.jpg"},
+  {id:142, cat:"Burritos", name:"Burrito de verdura", desc:"Cebolla morada, morron, zanahoria y zapallito verde + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:10000, img:"https://i.ibb.co/7Nk5y1F9/file-00000000f930820eb1296881108a1ff0.png"},
+  {id:143, cat:"Burritos", name:"Burrito de la casa", desc:"Carne, panceta, morrón y gramajo + 2 salsas (mayonesa, criolla, picante, guacamole, ajo, chimi, cheddar, mostaza, barbacoa, ketchup).", price:11000, img:"https://i.ibb.co/MkfKSgsZ/file-00000000d73c820e94d94c7584ffe265.png"},
+
+  // MILANESA
+  {id:144, cat:"Milanesa", name:"Milanesa con papas fritas", desc:"Milanesa de carne empanada, con papas fritas caseras.", price:13000, img:"https://i.ibb.co/sd3PY4vZ/file-00000000937c820eb454540c40023e30.png"},
+  {id:145, cat:"Milanesa", name:"Milanesa napolitana", desc:"Milanesa con jamón, queso fundido y salsa de tomate.", price:15000, img:"https://i.ibb.co/MkKSFH3d/file-00000000b364820e954e273c8b23a2f2.png"},
+  {id:146, cat:"Milanesa", name:"Milanesa a caballo", desc:"Milanesa con huevo frito y papas fritas.", price:15000, img:"https://i.ibb.co/kg2dqvS5/file-000000005cb8820e93cd0795d5a61384.png"},
+  {id:147, cat:"Milanesa", name:"Milanesa con cheddar", desc:"Milanesa con queso cheddar.", price:15000, img:"https://i.ibb.co/yBRvGT8Q/Gemini-Generated-Image-uayf0tuayf0tuayf.jpg"},
+  {id:148, cat:"Milanesa", name:"Milanesa fugazzeta", desc:"Milanesa con cebolla caramelizada.", price:15000, img:"https://i.ibb.co/MyDmM9gn/Gemini-Generated-Image-yv6cquyv6cquyv6c.jpg"},
+  {id:149, cat:"Milanesa", name:"Milanesa roquefort", desc:"Milanesa con queso roquefort y salsa de tomate.", price:15000, img:"https://i.ibb.co/ZRnSw9Wq/file-0000000086a8820e9a7fba50848be685.png"},
+  {id:150, cat:"Milanesa", name:"Milanesa de pollo", desc:"Milanesa de pollo con papas fritas.", price:13000, img:"https://i.ibb.co/sd3PY4vZ/file-00000000937c820eb454540c40023e30.png"},
+  {id:151, cat:"Milanesa", name:"Milanesa napolitana de pollo", desc:"Milanesa de pollo con jamón, queso fundido y salsa de tomate.", price:15000, img:"https://i.ibb.co/MkKSFH3d/file-00000000b364820e954e273c8b23a2f2.png"},
+  {id:152, cat:"Milanesa", name:"Milanesa caseritos ", desc:"Milanesa con huevos fritos, muzza, panceta, verdeo y salsa de tomate.", price:16000, img:"https://i.ibb.co/nNQFVKMp/file-00000000bfc8820ebd720ee1ba3e32a8.png"},
+
+  // LOMOPIZZA
+  {id:153, cat:"Para compartir", name:"Lomopizza ", desc:"Doble piso de pizza, bife de carne, tomate, lechuga, huevo frito, jamon y queso.", price:31000, img:"https://i.ibb.co/JwgZ73MD/file-000000008108820e960181fdae272880.png"},
+  {id:154, cat:"Para compartir", name:"Hamburpizza", desc:"Doble piso de pizza, hamburguesas de carne, tomate, lechuga, huevo frito, jamon y queso.", price:31000, img:"https://i.ibb.co/JwgZ73MD/file-000000008108820e960181fdae272880.png"},
+  {id:155, cat:"Para compartir", name:"Hamburpollo", desc:"Doble piso de pizza, hamburguesas de pollo, lechuga, huevo frito, jamon y queso.", price:31000, img:"https://i.ibb.co/JwgZ73MD/file-000000008108820e960181fdae272880.png"},
+  {id:156, cat:"Para compartir", name:"Choripizza", desc:"Doble piso de pizza, chorizo, tomate, lechuga, huevo frito, jamon y queso.", price:31000, img:"https://i.ibb.co/JwgZ73MD/file-000000008108820e960181fdae272880.png"},
+  {id:157, cat:"Para compartir", name:"Milapizza", desc:"Doble piso de pizza, milanesa de carne, tomate, lechuga, huevo frito, jamon y queso.", price:31000, img:"https://i.ibb.co/JwgZ73MD/file-000000008108820e960181fdae272880.png"},
+
+  // PAPAS FRITAS
+  {id:158, cat:"Papas fritas", name:"Papas fritas clásicas", desc:"Porción de papas fritas.", price:7000, img:"https://i.ibb.co/yBYhbqNK/file-000000009b68820ead1c1dedb204796f.png"},
+  {id:159, cat:"Papas fritas", name:"Papas con cheddar, panceta y verdeo", desc:"Porción de papas fritas con cheddar, panceta y verdeo.", price:10000, img:"https://i.ibb.co/bRDDvLXR/file-000000003ca8820ea6c9a8aa651c94d6.png"},
+  {id:160, cat:"Papas fritas", name:"Papas caseritos: crema, panceta y verdeo", desc:"Porción de papas fritas, crema, panceta y verdeo.", price:10000, img:"https://i.ibb.co/My0Rt7gQ/file-000000002f38820eab6a99bb75133b52.png"},
+  {id:161, cat:"Papas fritas", name:"Papas con cheddar", desc:"Porción de papas fritas y cheddar.", price:9000, img:"https://i.ibb.co/gMGkPnHb/file-000000003d70820e99bf8f35810b9217.png"},
+  {id:162, cat:"Papas fritas", name:"Papas 4 quesos", desc:"Porción de papas fritas, roquefort, parmesano y provoleta.", price:10000, img:"https://i.ibb.co/mVgqxWRM/file-000000009eb8820eadacd08a4883a565.png"},
+  {id:163, cat:"Papas fritas", name:"Papas revueltas", desc:"Porción de papas fritas con huevos revueltos.", price:9000, img:"https://i.ibb.co/hxZ8bb2Q/IMG-20261004-164647.jpg"},
+  {id:164, cat:"Papas fritas", name:"Papas salchipapas", desc:"Porción de papas fritas, salchichas y cheddar.", price:9000, img:"https://i.ibb.co/fdCsTSWH/IMG-20261004-164520.jpg"},
+  {id:165, cat:"Papas fritas", name:"Papas rancheras", desc:"Porción de papas fritas, pimientos y salchichas.", price:9000, img:"https://i.ibb.co/d0ybv460/file-000000009980820eab20ffcc89eb70b7.png"},
+
+];
+
+/* ============================================================
+   LÓGICA — no necesitas tocar nada de aquí hacia abajo
+============================================================= */
+document.getElementById("bizName").textContent = CONFIG.businessName;
+  // Formatea números al estilo argentino: punto cada tres cifras, sin decimales.
+function formatPrice(n){
+  return CONFIG.currency + n.toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+document.getElementById("bizTag").textContent = CONFIG.tagline;
+document.getElementById("logoBadge").textContent = CONFIG.logoEmoji;
+const statusPill = document.getElementById("statusPill");
+
+function isWithinSchedule(){
+  const now = new Date();
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  return CONFIG.schedule.some(range => {
+    const [sh, sm] = range.start.split(":").map(Number);
+    const [eh, em] = range.end.split(":").map(Number);
+    const startMin = sh * 60 + sm;
+    const endMin = eh * 60 + em;
+    if(endMin <= startMin){
+      return minutesNow >= startMin || minutesNow < endMin;
+    }
+    return minutesNow >= startMin && minutesNow < endMin;
+  });
+}
+
+function updateOpenStatus(){
+  if(isWithinSchedule()){
+    statusPill.classList.remove("closed");
+    statusPill.innerHTML = '<span class="status-dot"></span> Abierto ahora';
+  } else {
+    statusPill.classList.add("closed");
+    statusPill.innerHTML = '<span class="status-dot"></span> Cerrado por ahora';
+  }
+}
+updateOpenStatus();
+setInterval(updateOpenStatus, 60000);
+
+// Banner de promos dinámico: toma el mayor descuento de la categoría "Promos"
+const promoItems = PRODUCTS.filter(p => p.cat === "Promos" && p.oldPrice);
+if(promoItems.length){
+  const best = promoItems.reduce((a,b) => {
+    const da = 1 - a.price/a.oldPrice, db = 1 - b.price/b.oldPrice;
+    return db > da ? b : a;
+  });
+  const pct = Math.round((1 - best.price/best.oldPrice) * 100);
+  document.getElementById("promoText").textContent = `🎉 Promos con hasta ${pct}% de descuento`;
+} else {
+  document.getElementById("promoBanner").style.display = "none";
+}
+document.getElementById("promoBanner").onclick = () => {
+  const promoSection = document.getElementById("sec-Promos");
+  if(promoSection) promoSection.scrollIntoView({behavior:"smooth", block:"start"});
+};
+
+const cats = [...new Set(PRODUCTS.map(p => p.cat))];
+const catNav = document.getElementById("catNav");
+const menuWrap = document.getElementById("menuWrap");
+let cart = {}; // { productId: qty }
+
+cats.forEach((cat, i) => {
+  const btn = document.createElement("button");
+  btn.className = "cat-btn" + (i === 0 ? " active" : "");
+  btn.textContent = cat;
+  btn.dataset.cat = cat;
+  btn.onclick = () => {
+    document.getElementById("sec-" + cat).scrollIntoView({behavior:"smooth", block:"start"});
+  };
+  catNav.appendChild(btn);
+
+  const section = document.createElement("section");
+  section.className = "cat-section";
+  section.id = "sec-" + cat;
+  const items = PRODUCTS.filter(p => p.cat === cat);
+  section.innerHTML = `<h2 class="cat-heading">${cat}</h2><p class="cat-sub">${items.length} opciones</p>`;
+  items.forEach(p => section.appendChild(renderItem(p)));
+  menuWrap.appendChild(section);
+});
+
+function renderItem(p){
+  const row = document.createElement("div");
+  row.className = "item";
+  const discountPct = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : null;
+  const isPhoto = /^https?:\/\//.test(p.img);
+  const imgContent = isPhoto
+    ? `<img src="${p.img}" alt="${p.name}">`
+    : p.img;
+  row.innerHTML = `
+    <div class="item-img">
+      ${discountPct ? `<span class="discount-flag">-${discountPct}%</span>` : ""}
+      ${imgContent}
+    </div>
+    <div class="item-info">
+      <div class="item-name">${p.name}</div>
+      <div class="item-desc">${p.desc}</div>
+      <div class="item-bottom">
+        <div class="price-row">
+          <span class="price-now">${formatPrice(p.price)}</span>
+         ${p.oldPrice ? `<span class="price-old">${formatPrice(p.oldPrice)}</span>` : ""}
+        </div>
+        <div class="qty-slot" id="qty-${p.id}">
+          <button class="add-btn" onclick="changeQty(${p.id},1)">+</button>
+        </div>
+      </div>
+    </div>
+  `;
+  return row;
+}
+
+function renderQtyControl(id){
+  const slot = document.getElementById(`qty-${id}`);
+  if(!slot) return;
+  const qty = cart[id] || 0;
+  if(qty === 0){
+    slot.innerHTML = `<button class="add-btn" onclick="changeQty(${id},1)">+</button>`;
+  } else {
+    slot.innerHTML = `
+      <div class="stepper">
+        <button onclick="changeQty(${id},-1)">−</button>
+        <span>${qty}</span>
+        <button onclick="changeQty(${id},1)">+</button>
+      </div>`;
+  }
+}
+
+function changeQty(id, delta){
+  cart[id] = (cart[id] || 0) + delta;
+  if(cart[id] <= 0) delete cart[id];
+  renderQtyControl(id);
+  updateCartBar();
+  renderDrawer();
+}
+
+function cartEntries(){
+  return Object.entries(cart).map(([id, qty]) => {
+    const product = PRODUCTS.find(p => p.id === Number(id));
+    return {product, qty};
+  });
+}
+
+function cartTotal(){
+  return cartEntries().reduce((sum, e) => sum + e.product.price * e.qty, 0);
+}
+
+function cartCount(){
+  return Object.values(cart).reduce((a,b) => a+b, 0);
+}
+
+const cartBar = document.getElementById("cartBar");
+function updateCartBar(){
+  const count = cartCount();
+  document.getElementById("cartBarCount").textContent = count === 1 ? "1 producto" : `${count} productos`;
+  document.getElementById("cartBarTotal").textContent = formatPrice(cartTotal());
+  cartBar.classList.toggle("show", count > 0);
+  document.getElementById("sendBtn").disabled = count === 0;
+}
+
+const overlay = document.getElementById("overlay");
+const drawer = document.getElementById("drawer");
+
+function openDrawer(){
+  renderDrawer();
+  overlay.classList.add("show");
+  drawer.classList.add("show");
+}
+function closeDrawer(){
+  overlay.classList.remove("show");
+  drawer.classList.remove("show");
+}
+document.getElementById("openCartBtn").onclick = openDrawer;
+document.getElementById("closeCartBtn").onclick = closeDrawer;
+overlay.onclick = closeDrawer;
+
+function renderDrawer(){
+  const body = document.getElementById("drawerBody");
+  const entries = cartEntries();
+  if(entries.length === 0){
+    body.innerHTML = `<p class="empty-msg">Tu pedido está vacío. Agrega algo del menú para empezar.</p>`;
+  } else {
+    body.innerHTML = entries.map(e => `
+      <div class="cart-row">
+        <div>
+          <div class="cart-row-name">${e.qty} × ${e.product.name}</div>
+          <div class="cart-row-price">${formatPrice(e.product.price * e.qty)}</div>
+          <button class="cart-row-remove" onclick="removeItem(${e.product.id})">Quitar</button>
+        </div>
+      </div>
+    `).join("") + `
+      <label class="notes-label" for="notesField">Notas para tu pedido (opcional)</label>
+      <textarea class="notes-input" id="notesField" rows="2" placeholder="Ej: dirección de entrega, sin cebolla, etc.">${window.__orderNotes || ""}</textarea>
+    `;
+    document.getElementById("notesField").oninput = (e) => { window.__orderNotes = e.target.value; };
+  }
+  document.getElementById("drawerTotal").textContent = formatPrice(cartTotal());
+}
+
+function removeItem(id){
+  delete cart[id];
+  renderQtyControl(id);
+  updateCartBar();
+  renderDrawer();
+}
+
+document.getElementById("sendBtn").onclick = () => {
+  const entries = cartEntries();
+  if(entries.length === 0) return;
+  let msg = `Hola ${CONFIG.businessName}, quiero hacer este pedido:\n\n`;
+  entries.forEach(e => {
+    msg += `• ${e.qty} × ${e.product.name} — ${formatPrice(e.product.price * e.qty)}\n`;
+  });
+  msg += `\nTotal: ${formatPrice(cartTotal())}`;
+  if(window.__orderNotes){
+    msg += `\n\nNotas: ${window.__orderNotes}`;
+  }
+  const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+};
+
+updateCartBar();
+</script>
+</body>
+</html>
